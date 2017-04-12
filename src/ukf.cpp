@@ -410,13 +410,21 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
     double v1 = cos(yaw)*v;
     double v2 = sin(yaw)*v;
 
+    /**
+     * Handle case for very low values for px and py , prevent them from going to zero
+     */
+    if(abs(p_x)<0.001){
+      p_x = 0.001;
+    }
+
+    if(abs(p_y)<0.001){
+      p_y = 0.001;
+    }
+
     // measurement model
     Zsig(0,i) = sqrt(p_x*p_x + p_y*p_y);                        //r
-    if(p_x == p_y == 0){
-      Zsig(1,i) = 0;
-    }else {
-      Zsig(1, i) = atan2(p_y, p_x);
-    }//phi
+    Zsig(1, i) = atan2(p_y, p_x);
+    //phi
     if (Zsig(0, i) < 0.001) {
       Zsig(2, i) = (p_x * v1 + p_y * v2) / 0.001;  //r_dot
     } else {
